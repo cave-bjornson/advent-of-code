@@ -6,7 +6,7 @@ from utils import Solution
 class Q01(Solution):
     def __init__(self):
         day, year = aocd.get_day_and_year()
-        super().__init__(year, day)
+        super().__init__(year, day, input_transform=lambda x: x)
 
     def solution_a(self) -> int:
         up = self.input_data.count("(")
