@@ -1,6 +1,6 @@
 import aocd
 
-from utils import Solution
+from utils.fixture import Solution
 
 
 class Q01(Solution):

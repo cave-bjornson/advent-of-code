@@ -19,6 +19,9 @@ class Solution(ABC):
         self.puzzle = Puzzle(year=year, day=day)
         self._input_data = input_data
         self.input_transform = input_transform
+        print(
+            f"Solution for year {self.puzzle.year}, day {self.puzzle.day}, {self.puzzle.title}"
+        )
 
     @property
     def input_data(self):
@@ -54,6 +57,8 @@ class Solution(ABC):
                         solution="A", sample=e.input_data, expected=e.answer_a, was=a
                     )
                     break
+        else:
+            print("Example A Passed")
 
         for e in p2_examples:
             self.input_data = e.input_data
@@ -65,7 +70,7 @@ class Solution(ABC):
                     )
                     break
         else:
-            print("All samples passed.")
+            print("Example B passed.")
 
     def solve_real(self):
         self.input_data = self.puzzle.input_data

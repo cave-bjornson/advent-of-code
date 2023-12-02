@@ -4,7 +4,7 @@ from textwrap import dedent
 import aocd
 from aocd.examples import Example
 
-from utils import Solution
+from utils.fixture import Solution
 
 p2_examples = [
     Example(

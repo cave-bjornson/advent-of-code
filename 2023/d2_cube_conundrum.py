@@ -3,7 +3,7 @@ import re
 
 import aocd
 
-from utils import Solution
+from utils.fixture import Solution
 
 val_pattern = re.compile(r"(?P<val>\d+) (?P<rgb>[rgb])")
 id_pattern = re.compile(r"(?P<id>\d+):")
