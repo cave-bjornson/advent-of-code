@@ -6,6 +6,7 @@ import aocd
 from utils import Solution
 
 val_pattern = re.compile(r"(?P<val>\d+) (?P<rgb>[rgb])")
+id_pattern = re.compile(r"(?P<id>\d+):")
 
 
 class Day2(Solution):
@@ -15,7 +16,6 @@ class Day2(Solution):
 
     def solution_a(self) -> int:
         bag = int(bytes([12, 13, 14]).hex(), base=16)
-        id_pattern = re.compile(r"(?P<id>\d+):")
         mask = "0000ff"
         id_sum = 0
         for line in self.input_data:
