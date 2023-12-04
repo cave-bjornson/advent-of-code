@@ -33,13 +33,13 @@ class Solution(ABC):
 
     @abstractmethod
     def solution_a(self) -> int:
-        pass
+        return 0
 
     @abstractmethod
     def solution_b(self) -> int:
-        pass
+        return 0
 
-    def solve_examples(self, p1_examples=None, p2_examples=None):
+    def solve_examples(self, p1=True, p2=True, p1_examples=None, p2_examples=None):
         def print_fail_msg(solution, sample, expected, was):
             print(
                 f"Solution {solution} Failed for sample data {sample}. Expected: {expected}, Was {was}"
@@ -48,36 +48,46 @@ class Solution(ABC):
         p1_examples = p1_examples or self.puzzle.examples
         p2_examples = p2_examples or p1_examples
 
-        for e in p1_examples:
-            self.input_data = e.input_data
-            if e.answer_a:
-                a = self.solution_a()
-                if a != int(e.answer_a):
-                    print_fail_msg(
-                        solution="A", sample=e.input_data, expected=e.answer_a, was=a
-                    )
-                    break
-        else:
-            print("Example A Passed")
+        if p1:
+            for e in p1_examples:
+                self.input_data = e.input_data
+                if e.answer_a:
+                    a = self.solution_a()
+                    if a != int(e.answer_a):
+                        print_fail_msg(
+                            solution="A",
+                            sample=e.input_data,
+                            expected=e.answer_a,
+                            was=a,
+                        )
+                        break
+            else:
+                print("Example A Passed")
 
-        for e in p2_examples:
-            self.input_data = e.input_data
-            if e.answer_b:
-                b = self.solution_b()
-                if b != int(e.answer_b):
-                    print_fail_msg(
-                        solution="B", sample=e.input_data, expected=e.answer_b, was=b
-                    )
-                    break
-        else:
-            print("Example B passed.")
+        if p2:
+            for e in p2_examples:
+                self.input_data = e.input_data
+                if e.answer_b:
+                    b = self.solution_b()
+                    if b != int(e.answer_b):
+                        print_fail_msg(
+                            solution="B",
+                            sample=e.input_data,
+                            expected=e.answer_b,
+                            was=b,
+                        )
+                        break
+            else:
+                print("Example B passed.")
 
-    def solve_real(self):
+    def solve_real(self, p1=True, p2=True):
         self.input_data = self.puzzle.input_data
-        a = self.solution_a()
-        b = self.solution_b()
-        print(f"Puzzle A:s answer: {a}")
-        print(f"Puzzle B:s answer: {b}")
+        if p1:
+            a = self.solution_a()
+            print(f"Puzzle A:s answer: {a}")
+        if p2:
+            b = self.solution_b()
+            print(f"Puzzle B:s answer: {b}")
 
     def solve_performance(self, number=1):
         self.input_data = self.puzzle.input_data
