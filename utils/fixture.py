@@ -89,9 +89,11 @@ class Solution(ABC):
             b = self.solution_b()
             print(f"Puzzle B:s answer: {b}")
 
-    def solve_performance(self, number=1):
+    def solve_performance(self, number=1, p1=True, p2=True):
         self.input_data = self.puzzle.input_data
-        t_a = timeit.Timer(lambda: self.solution_a()).timeit(number) / number
-        t_b = timeit.Timer(lambda: self.solution_b()).timeit(number) / number
-        print(f"Solution A average time: {t_a:.3f} seconds.")
-        print(f"Solution B average time: {t_b:.3f} seconds.")
+        if p1:
+            t_a = timeit.Timer(lambda: self.solution_a()).timeit(number) / number
+            print(f"Solution A average time: {t_a:.3f} seconds.")
+        if p2:
+            t_b = timeit.Timer(lambda: self.solution_b()).timeit(number) / number
+            print(f"Solution B average time: {t_b:.3f} seconds.")

@@ -1,12 +1,36 @@
-import math
 import re
 
 import aocd
 
 from utils.fixture import Solution
-from utils.navigation import Grid, Point, neighbours_from_point
+from utils.navigation import (
+    Point,
+    neighbours_from_point,
+    Grid,
+)
 
-pattern = re.compile(r"\d+")
+
+def generate_neighbour_set(point_set: set[Point], grid):
+    return {
+        v
+        for val in [[*grid.neighbours_from_point(p).values()] for p in point_set]
+        for v in val
+    } - point_set
+
+
+def generate_set_dict(pattern, data: list[str]):
+    schematic: list[str] = data
+    symbols = list[Point]()
+    numbers = dict[frozenset, int]()
+    for y, line in enumerate(schematic):
+        for match in re.finditer(pattern, line):
+            if match.group().isdigit():
+                point_set = frozenset(Point(x, y) for x in range(*match.span()))
+                numbers[point_set] = int(match.group())
+            else:
+                symbols.append(Point(x=match.span()[0], y=y))
+
+    return numbers, symbols
 
 
 class Day3(Solution):
@@ -15,69 +39,45 @@ class Day3(Solution):
         super().__init__(year, day)
 
     def solution_a(self) -> int:
+        pattern = re.compile(r"\d+")
+        part_number_sum = 0
         schematic: list[str] = self.input_data
         grid = Grid(
             x_min=0, x_max=len(schematic[0]) - 1, y_min=0, y_max=len(schematic) - 1
         )
-        part_number_sum = 0
         for y, line in enumerate(schematic):
             for match in re.finditer(pattern, line):
-                l_point = Point(match.span()[0], y)
-                r_point = Point(match.span()[1] - 1, y)
-                l_neighbours = grid.neighbours_from_point(l_point)
-                r_neighbours = grid.neighbours_from_point(r_point)
-                point_set = set[Point]([*l_neighbours.values(), *r_neighbours.values()])
-
-                for p in point_set:
-                    char = schematic[p.y][p.x]
-                    if not (char == "." or char.isdigit()):
+                point_set = {Point(x, y) for x in range(*match.span())}
+                neighbour_set = generate_neighbour_set(point_set, grid)
+                for px, py in neighbour_set:
+                    char = schematic[py][px]
+                    if not (char.isdigit() or char == "."):
                         part_number_sum += int(match.group())
                         break
 
         return part_number_sum
 
     def solution_b(self) -> int:
-        schematic: list[str] = self.input_data
+        pattern = re.compile(r"\*|\d+")
+        numbers, gears = generate_set_dict(pattern, self.input_data)
         gear_ratio_sum = 0
-        for y, line in enumerate(schematic):
-            for match in re.finditer(r"\*", line):
-                gear_point = Point(x=match.span()[0], y=y)
-                gear_neighbours = neighbours_from_point(gear_point)
-                gaps = 0
-                number_point_1 = None
-                number_point_2 = None
-                neighbours = [*gear_neighbours.values()][:-1]
-                for p in neighbours:
-                    if schematic[p.y][p.x].isdigit():
-                        if not number_point_1:
-                            number_point_1 = p
-                        elif number_point_1 and gaps == 1:
-                            if not number_point_2:
-                                number_point_2 = p
-                    elif number_point_1 and gaps == 0:
-                        gaps += 1
-                    elif number_point_2 and gaps == 1:
-                        gaps += 1
+
+        for p in gears:
+            neighbour_set = set(neighbours_from_point(p).values())
+            gear_numbers = []
+            for ps in [*numbers.keys()]:
+                if neighbour_set & ps:
+                    gear_numbers.append(numbers.pop(ps))
+                    if len(gear_numbers) >= 2:
+                        gear_ratio = gear_numbers[0] * gear_numbers[1]
+                        gear_ratio_sum += gear_ratio
                         break
 
-                if not gaps == 2:
-                    continue
-
-                gear_ratio = 1
-                for np in (number_point_1, number_point_2):
-                    number_line = schematic[np.y]
-                    number_start = number_line.rfind(".", 0, np.x) + 1
-                    match = re.search(pattern, number_line[number_start:])
-                    gear_ratio *= int(match.group())
-
-                gear_ratio_sum += gear_ratio
-        print(gear_ratio_sum)
         return gear_ratio_sum
-        67250961
 
 
 if __name__ == "__main__":
     sol = Day3()
-    sol.solve_examples(p1=False)
-    sol.solve_real(p1=False)
-    # sol.solve_performance()
+    sol.solve_examples()
+    sol.solve_real()
+    sol.solve_performance()
