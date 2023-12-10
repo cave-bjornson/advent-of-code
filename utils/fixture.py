@@ -56,7 +56,7 @@ class Solution(ABC):
                     if a != int(e.answer_a):
                         print_fail_msg(
                             solution="A",
-                            sample=e.input_data,
+                            sample="",
                             expected=e.answer_a,
                             was=a,
                         )
@@ -72,7 +72,7 @@ class Solution(ABC):
                     if b != int(e.answer_b):
                         print_fail_msg(
                             solution="B",
-                            sample=e.input_data,
+                            sample="",
                             expected=e.answer_b,
                             was=b,
                         )
