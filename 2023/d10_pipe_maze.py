@@ -38,7 +38,7 @@ pipes, p_from_char = pipe_factory(
 )
 
 
-class Day9(Solution):
+class Day10(Solution):
     def __init__(self):
         day, year = aocd.get_day_and_year()
         super().__init__(
@@ -84,7 +84,7 @@ class Day9(Solution):
 
 
 if __name__ == "__main__":
-    sol = Day9()
+    sol = Day10()
     sol.solve_examples(p2=False, p1_examples=generate_example(SQUARE_LOOP, answer_a=4))
     sol.solve_real(p2=False)
     sol.solve_performance(p2=False)
