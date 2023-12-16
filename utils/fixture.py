@@ -46,7 +46,7 @@ class Solution(ABC):
             )
 
         p1_examples = p1_examples or self.puzzle.examples
-        p2_examples = p2_examples or p1_examples
+        p2_examples = p2_examples or self.puzzle.examples
 
         if p1:
             for e in p1_examples:
@@ -61,6 +61,9 @@ class Solution(ABC):
                             was=a,
                         )
                         break
+                else:
+                    print("No answer provided for A")
+                    break
             else:
                 print("Example A Passed")
 
@@ -77,6 +80,9 @@ class Solution(ABC):
                             was=b,
                         )
                         break
+                else:
+                    print("No answer provided for B")
+                    break
             else:
                 print("Example B passed.")
 
