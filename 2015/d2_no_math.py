@@ -7,7 +7,7 @@ import re
 import aocd
 
 from utils.fixture import Solution
-from utils.helper_functions import split_to_integers
+from utils.helper_functions import split_to_int
 
 val_pattern = re.compile(r"(?P<val>\d+) (?P<rgb>[rgb])")
 id_pattern = re.compile(r"(?P<id>\d+):")
@@ -21,7 +21,7 @@ class Day2(Solution):
     def solution_a(self) -> int:
         order_area = 0
         for line in self.input_data:
-            dim = split_to_integers(line, "x")
+            dim = split_to_int(line, "x")
             combinations = itertools.combinations(dim, 2)
             sides = [s for s in itertools.starmap(operator.mul, combinations)]
             slack = min(sides)
@@ -33,7 +33,7 @@ class Day2(Solution):
     def solution_b(self) -> int:
         order_length = 0
         for line in self.input_data:
-            dim = split_to_integers(line, "x")
+            dim = split_to_int(line, "x")
             bow = math.prod(dim)
             dim.remove(max(dim))
             ribbon = sum(dim) * 2
