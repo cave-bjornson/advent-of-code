@@ -1,7 +1,7 @@
 from aocd.examples import Example
 
 
-def split_to_int(text: str, sep: str = " ") -> [int]:
+def split_to_int(text: str, sep: str = None) -> [int]:
     return [int(x) for x in text.split(sep)]
 
 
