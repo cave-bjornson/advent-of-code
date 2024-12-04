@@ -2,8 +2,11 @@ import datetime
 import timeit
 from abc import ABC
 
+from aocd.examples import Example
 from aocd.models import Puzzle
 from dotenv import load_dotenv
+
+from utils.helper_functions import generate_example
 
 load_dotenv()
 
@@ -22,7 +25,7 @@ class Solution(ABC):
         print(
             f"Solution for year {self.puzzle.year}, day {self.puzzle.day}, {self.puzzle.title}"
         )
-        if not hasattr(self, "solution_a") or not hasattr(self, "solution_b"):
+        if not (hasattr(self, "solution_a") or hasattr(self, "solution_b")):
             print("No solutions provided")
 
     @property
@@ -33,14 +36,32 @@ class Solution(ABC):
     def input_data(self, value):
         self._input_data = self.input_transform(value)
 
-    def solve_examples(self, p1=True, p2=True, p1_examples=None, p2_examples=None):
+    def solve_examples(
+        self,
+        p1=True,
+        p2=True,
+        p1_examples=None,
+        p2_examples=None,
+        p1_answer=None,
+        p2_answer=None,
+    ):
         def print_fail_msg(solution, sample, expected, was):
             print(
                 f"Solution {solution} Failed for sample data {sample}. Expected: {expected}, Was {was}"
             )
 
-        p1_examples = p1_examples or self.puzzle.examples
+        p1_examples: list[Example] = p1_examples or self.puzzle.examples
         p2_examples = p2_examples or self.puzzle.examples
+
+        if p1_answer or p2_answer:
+            new_examples = list()
+            for e in p1_examples:
+                new_examples = generate_example(
+                    input_data=e.input_data,
+                    answer_a=p1_answer if p1_answer else e.answer_a,
+                    answer_b=p2_answer if p2_answer else e.answer_b,
+                )
+            p1_examples = new_examples
 
         if p1 and hasattr(self, "solution_a"):
             for e in p1_examples:
@@ -59,7 +80,7 @@ class Solution(ABC):
                     print("No answer provided for example A")
                     break
             else:
-                print("Example A Passed")
+                print(f"Example A Passed with answer {e.answer_a}")
 
         if p2 and hasattr(self, "solution_b"):
             for e in p2_examples:
@@ -78,7 +99,7 @@ class Solution(ABC):
                     print("No answer provided for example B")
                     break
             else:
-                print("Example B passed")
+                print(f"Example B passed with answer{e.answer_b}")
 
     def solve_real(self, p1=True, p2=True):
         self.input_data = self.puzzle.input_data
