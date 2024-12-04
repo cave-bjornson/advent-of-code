@@ -62,6 +62,7 @@ class Solution(ABC):
                     answer_b=p2_answer if p2_answer else e.answer_b,
                 )
             p1_examples = new_examples
+            p2_examples = new_examples
 
         if p1 and hasattr(self, "solution_a"):
             for e in p1_examples:
@@ -99,7 +100,7 @@ class Solution(ABC):
                     print("No answer provided for example B")
                     break
             else:
-                print(f"Example B passed with answer{e.answer_b}")
+                print(f"Example B passed with answer {e.answer_b}")
 
     def solve_real(self, p1=True, p2=True):
         self.input_data = self.puzzle.input_data
