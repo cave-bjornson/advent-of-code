@@ -16,3 +16,7 @@ def generate_example(
             extra="",
         )
     ]
+
+
+def my_sign(x):
+    return (x > 0) - (x < 0)

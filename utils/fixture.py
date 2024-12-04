@@ -1,6 +1,6 @@
 import datetime
 import timeit
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from aocd.models import Puzzle
 from dotenv import load_dotenv
@@ -22,6 +22,8 @@ class Solution(ABC):
         print(
             f"Solution for year {self.puzzle.year}, day {self.puzzle.day}, {self.puzzle.title}"
         )
+        if not hasattr(self, "solution_a") or not hasattr(self, "solution_b"):
+            print("No solutions provided")
 
     @property
     def input_data(self):
@@ -30,14 +32,6 @@ class Solution(ABC):
     @input_data.setter
     def input_data(self, value):
         self._input_data = self.input_transform(value)
-
-    @abstractmethod
-    def solution_a(self) -> int:
-        return 0
-
-    @abstractmethod
-    def solution_b(self) -> int:
-        return 0
 
     def solve_examples(self, p1=True, p2=True, p1_examples=None, p2_examples=None):
         def print_fail_msg(solution, sample, expected, was):
@@ -48,7 +42,7 @@ class Solution(ABC):
         p1_examples = p1_examples or self.puzzle.examples
         p2_examples = p2_examples or self.puzzle.examples
 
-        if p1:
+        if p1 and hasattr(self, "solution_a"):
             for e in p1_examples:
                 self.input_data = e.input_data
                 if e.answer_a:
@@ -62,12 +56,12 @@ class Solution(ABC):
                         )
                         break
                 else:
-                    print("No answer provided for A")
+                    print("No answer provided for example A")
                     break
             else:
                 print("Example A Passed")
 
-        if p2:
+        if p2 and hasattr(self, "solution_b"):
             for e in p2_examples:
                 self.input_data = e.input_data
                 if e.answer_b:
@@ -81,25 +75,25 @@ class Solution(ABC):
                         )
                         break
                 else:
-                    print("No answer provided for B")
+                    print("No answer provided for example B")
                     break
             else:
-                print("Example B passed.")
+                print("Example B passed")
 
     def solve_real(self, p1=True, p2=True):
         self.input_data = self.puzzle.input_data
-        if p1:
+        if p1 and hasattr(self, "solution_a"):
             a = self.solution_a()
             print(f"Puzzle A:s answer: {a}")
-        if p2:
+        if p2 and hasattr(self, "solution_b"):
             b = self.solution_b()
             print(f"Puzzle B:s answer: {b}")
 
     def solve_performance(self, number=1, p1=True, p2=True):
         self.input_data = self.puzzle.input_data
-        if p1:
+        if p1 and hasattr(self, "solution_a"):
             t_a = timeit.Timer(lambda: self.solution_a()).timeit(number) / number
             print(f"Solution A average time: {t_a:.3f} seconds.")
-        if p2:
+        if p2 and hasattr(self, "solution_b"):
             t_b = timeit.Timer(lambda: self.solution_b()).timeit(number) / number
             print(f"Solution B average time: {t_b:.3f} seconds.")
