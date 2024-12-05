@@ -1,7 +1,6 @@
 from collections import defaultdict, deque
 
 import aocd
-from icecream import ic
 
 from utils.fixture import Solution
 from utils.helper_functions import split_two_sections
@@ -49,31 +48,30 @@ class Day5(Solution):
     def solution_b(self) -> int:
         rule_dict, update_sequence = page_dict_and_list(self.input_data)
 
-        corrections = list()
+        mid_page_sum = 0
         for line in update_sequence:
             update_q = deque(line)
             right_order = True
             while len(update_q) > 1 and right_order:
                 current_page = update_q.popleft()
+
                 for page in update_q:
                     right_order = page in rule_dict[current_page]
                     if not right_order:
-                        corrections.append(line)
-                        break
+                        correction_q = deque(line)
+                        corrected = list()
 
-        mid_page_sum = 0
-        for line in corrections:
-            correction_q = deque(line)
-            corrected = list()
-            while correction_q:
-                current_page = correction_q.popleft()
-                for page in correction_q:
-                    if page not in rule_dict[current_page]:
-                        correction_q.append(current_page)
+                        while correction_q:
+                            current_page = correction_q.popleft()
+                            for c_page in correction_q:
+                                if c_page not in rule_dict[current_page]:
+                                    correction_q.append(current_page)
+                                    break
+                            else:
+                                corrected.append(current_page)
+
+                        mid_page_sum += int(corrected[len(corrected) // 2])
                         break
-                else:
-                    corrected.append(current_page)
-            mid_page_sum += int(corrected[len(corrected) // 2])
 
         return mid_page_sum
 
