@@ -1,3 +1,5 @@
+import os
+
 from aocd.examples import Example
 
 
@@ -20,3 +22,8 @@ def generate_example(
 
 def my_sign(x):
     return (x > 0) - (x < 0)
+
+
+def split_two_sections(text: str, sep: str = os.linesep + os.linesep):
+    section_one, section_two = text.split(sep)
+    return section_one.splitlines(), section_two.splitlines()

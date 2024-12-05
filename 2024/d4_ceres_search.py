@@ -1,5 +1,3 @@
-import re
-
 import aocd
 
 from utils.fixture import Solution

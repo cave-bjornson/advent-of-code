@@ -34,7 +34,10 @@ class Solution(ABC):
 
     @input_data.setter
     def input_data(self, value):
-        self._input_data = self.input_transform(value)
+        if self.input_transform:
+            self._input_data = self.input_transform(value)
+        else:
+            self._input_data = value
 
     def solve_examples(
         self,
