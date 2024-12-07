@@ -16,7 +16,7 @@ class Solution(ABC):
         self,
         year=datetime.date.today().year,
         day=datetime.date.today().day,
-        input_data="",
+        input_data: str | list[str] | list[list[str]] = "",
         input_transform=lambda x: x.splitlines(),
     ):
         self.puzzle = Puzzle(year=year, day=day)

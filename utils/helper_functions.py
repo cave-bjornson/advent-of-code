@@ -27,3 +27,7 @@ def my_sign(x):
 def split_two_sections(text: str, sep: str = os.linesep + os.linesep):
     section_one, section_two = text.split(sep)
     return section_one.splitlines(), section_two.splitlines()
+
+
+def split_to_matrix(text: str) -> list[list[str]]:
+    return [[*line] for line in text.splitlines()]

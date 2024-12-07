@@ -1,133 +1,143 @@
-import enum
-import functools
-import math
-from collections import namedtuple
-from enum import Enum
-from itertools import batched
-from typing import NamedTuple
+import os
+from enum import StrEnum
 
-# Point = namedtuple("Point", ["x", "y"])
-
-DIRECTION_NAMES = ("N", "S", "NE", "SW", "E", "W", "SE", "NW")
-DIRECTION_CHARS = ("8", "2", "9", "1", "6", "4", "3", "7")
-END_POINTS = ((0, 1), (0, -1), (1, 1), (-1, -1), (1, 0), (-1, 0), (1, -1), (-1, 1))
-PIPE_CHARS = ("|", "/", "-", "\\")
+from plum import dispatch
 
 
-class Point(NamedTuple):
-    x: int
-    y: int
+class Direction(StrEnum):
+    N = "N"
+    E = "E"
+    S = "S"
+    W = "W"
 
-
-class Direction(NamedTuple):
-    name: str
-    char: str
-    end_point: Point
-
-
-class Pipe(NamedTuple):
-    char: str
-    path: tuple[Direction, Direction]
-    opposite: tuple[Direction, Direction]
-
-
-def direction_factory(
-    direction_names=DIRECTION_NAMES,
-    direction_chars=DIRECTION_CHARS,
-    end_points=END_POINTS,
-):
-    directions = [
-        Direction(*d) for d in zip(direction_names, direction_chars, end_points)
-    ]
-    direction_from_name = dict(zip(direction_names, directions))
-    direction_from_char = dict(zip(direction_chars, directions))
-
-    return directions, direction_from_name, direction_from_char
-
-
-def pipe_factory(
-    pipe_chars=PIPE_CHARS,
-    direction_pairs=batched(direction_factory()[0], 2),
-):
-    pipes = [
-        Pipe(char=char, path=pair[0], opposite=pair[1])
-        for char, pair in zip(pipe_chars, direction_pairs)
-    ]
-
-    pipe_from_char = dict(zip(pipe_chars, pipes))
-
-    return pipes, pipe_from_char
-
-
-def pipe_exit_direction(pipe: Pipe, direction: Direction) -> Direction | None:
-    if direction == pipe.path[0]:
-        return pipe.path[1]
-    elif direction == pipe.opposite[0]:
-        return pipe.opposite[1]
-
-
-def point_from_direction(point: Point, direction: Direction) -> Point:
-    x, y = direction.end_point
-    return Point(x=point.x + x, y=point.y + y)
-
-
-def neighbours_from_point(origin: Point, directions) -> dict[Direction, Point]:
-    n = dict[Direction, Point]()
-    for d in directions:
-        n[d] = point_from_direction(origin, d)
-
-    return n
+    @classmethod
+    def _missing_(cls, value):
+        value = value.lower()
+        for member in cls:
+            if member.value == value:
+                return member
+        return None
 
 
 class Grid:
-    def __init__(
-        self,
-        origin=Point(x=0, y=0),
-        x_min=-math.inf,
-        x_max=math.inf,
-        y_min=-math.inf,
-        y_max=math.inf,
-    ):
-        self.current_position = origin
-        self.x_min = x_min
-        self.x_max = x_max
-        self.y_min = y_min
-        self.y_max = y_max
+    def __init__(self, matrix):
+        self.matrix: list[list[str]] = matrix
 
-    # TODO Check if origin point is within bounds.
-
-    def point_from_direction(
-        self, direction: Direction, point: Point = None
-    ) -> Point | None:
-        if not point:
-            point = self.current_position
-
-        new_point = point_from_direction(point, direction)
-
-        if (
-            self.x_min <= new_point.x <= self.x_max
-            and self.y_min <= new_point.y <= self.y_max
-        ):
-            return new_point
+    @dispatch
+    def square(self, point: "Point") -> str | None:
+        if self.inside(point):
+            return self.matrix[len(self.matrix) - 1 - point.y][point.x]
         else:
             return None
 
-    def neighbours_from_point(self, point=None) -> dict[Direction, Point]:
-        if not point:
-            point = self.current_position
+    @dispatch
+    def square(self, x=0, y=0) -> str | None:
+        if self.inside(x, y):
+            return self.matrix[len(self.matrix) - 1 - y][x]
+        else:
+            return None
 
-        n = dict[Direction, Point]()
-        for d in Direction:
-            n_point = self.point_from_direction(d, point)
-            if n_point:
-                n[d] = n_point
+    def set_square(self, point: "Point", value: str):
+        self.matrix[len(self.matrix) - 1 - point.y][point.x] = value
 
-        return n
+    @dispatch
+    def inside(self, point: "Point") -> bool:
+        return 0 <= point.x < len(self.matrix[0]) and 0 <= point.y < len(self.matrix)
+
+    @dispatch
+    def inside(self, x=0, y=0) -> bool:
+        return 0 <= x < len(self.matrix[0]) and 0 <= y < len(self.matrix)
+
+    def index(self, value):
+        for y, row in enumerate(self.matrix):
+            if value in row:
+                return Point(x=row.index(value), y=len(self.matrix) - 1 - y)
+
+    def __repr__(self):
+        return f"Grid({self.matrix})"
+
+    def __str__(self):
+        return os.linesep.join("".join(row) for row in self.matrix)
 
 
-if __name__ == "__main__":
-    _, p_from_chars = pipe_factory()
-    print(p_from_chars)
-    p = p_from_chars["|"]
-    _, d_from_name, _ = direction_factory()
-    print(pipe_exit_direction(p, d_from_name["N"]))
+class Point:
+    def __init__(self, x: int = 0, y: int = 0):
+        self.x = x
+        self.y = y
+
+    def __eq__(self, __value):
+        return self.x == __value.x and self.y == __value.y
+
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+    def __iter__(self):
+        return iter((self.x, self.y))
+
+    @dispatch
+    def __add__(self, other: "Point"):
+        return Point(self.x + other.x, self.y + other.y)
+
+    @dispatch
+    def __add__(self, other: tuple[int, int]):
+        return Point(self.x + other[0], self.y + other[1])
+
+    def __repr__(self):
+        return f"Point(x={self.x}, y={self.y})"
+
+
+class Actor:
+    def __init__(self, position=Point(), char="@"):
+        self.position = position
+        self.direction = Direction.N
+        self.char = char
+
+    def __repr__(self):
+        return f"Actor(position={self.position}, direction={self.direction}, char={self.char})"
+
+
+def point_from_direction(point: Point, direction: Direction):
+    transform = {
+        Direction.N: (0, 1),
+        Direction.E: (1, 0),
+        Direction.S: (0, -1),
+        Direction.W: (-1, 0),
+    }
+
+    return point + transform[direction]
+
+
+def test_point_from_direction():
+    p = Point()
+    np = point_from_direction(p, Direction.N)
+    ep = point_from_direction(p, Direction.E)
+    sp = point_from_direction(p, Direction.S)
+    wp = point_from_direction(p, Direction.W)
+    assert np == Point(0, 1)
+    assert ep == Point(1, 0)
+    assert sp == Point(0, -1)
+    assert wp == Point(-1, 0)
+
+
+def test_add_point_to_point():
+    p1 = Point()
+    p2 = Point(1, 1)
+    p3 = p1 + p2
+    p4 = p1 + (1, 2)
+    assert p3.x == 1 and p3.y == 1
+    assert p4.x == 1 and p4.y == 2
+
+
+def test_point_unpacking():
+    p1 = Point()
+    x, y = p1
+    assert x == 0 and y == 0
+
+
+def test_grid_square():
+    g = Grid([["s"]])
+    p = Point()
+    s = g.square(p)
+    assert s == "s"
+    s = g.square(0, 0)
+    assert s == "s"
