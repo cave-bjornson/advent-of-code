@@ -1,13 +1,8 @@
-from functools import singledispatchmethod
-from typing import Self, TypeVar, Type
-
 import aocd
-from icecream import ic
-from plum import dispatch
 
 from utils.fixture import Solution
 from utils.helper_functions import split_to_matrix
-from utils.navigation import Point, Grid, Actor, Direction, point_from_direction
+from utils.navigation import Grid, Actor, Direction, point_from_direction, turn, Turn
 
 
 class Day6(Solution):
@@ -20,20 +15,13 @@ class Day6(Solution):
         start_pos = lab.index("^")
         guard = Actor(position=start_pos, char="^")
 
-        turn_transform = {
-            Direction.N: Direction.E,
-            Direction.E: Direction.S,
-            Direction.S: Direction.W,
-            Direction.W: Direction.N,
-        }
-
         walked = set()
 
         while lab.inside(guard.position):
             ahead_pos = point_from_direction(guard.position, guard.direction)
 
             if lab.square(ahead_pos) == "#":
-                guard.direction = turn_transform[guard.direction]
+                guard.direction = turn(guard.direction, Turn.Right)
                 continue
 
             walked.add(guard.position)

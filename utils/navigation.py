@@ -1,5 +1,5 @@
 import os
-from enum import StrEnum
+from enum import StrEnum, auto
 
 from plum import dispatch
 
@@ -17,6 +17,29 @@ class Direction(StrEnum):
             if member.value == value:
                 return member
         return None
+
+
+class Turn(StrEnum):
+    Right = auto()
+    Left = auto()
+
+
+def turn(direction: Direction, turn: Turn) -> Direction:
+    right_turn = {
+        Direction.N: Direction.E,
+        Direction.E: Direction.S,
+        Direction.S: Direction.W,
+        Direction.W: Direction.N,
+    }
+
+    left_turn = {
+        Direction.N: Direction.W,
+        Direction.W: Direction.S,
+        Direction.S: Direction.E,
+        Direction.E: Direction.N,
+    }
+
+    return right_turn[direction] if turn.Right else left_turn[direction]
 
 
 class Grid:
@@ -61,6 +84,8 @@ class Grid:
 
 
 class Point:
+    __slots__ = ("x", "y")
+
     def __init__(self, x: int = 0, y: int = 0):
         self.x = x
         self.y = y
