@@ -2,7 +2,7 @@ import aocd
 
 from utils.fixture import Solution
 from utils.helper_functions import split_to_matrix
-from utils.navigation import Grid, Actor, Direction, point_from_direction, turn, Turn
+from utils.navigation import Grid, Actor, point_from_direction, turn, Turn
 
 
 class Day6(Solution):
